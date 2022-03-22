@@ -1,0 +1,14 @@
+*.pyc
+__pycache__/
+libs/__pycache__/
+.DS_Store
+.DS_Store/
+*.log
+_logs/
+.env
+.vscode/
+workspace.code-workspace
+*.html
+*.csv
+*data/*.csv
+*data/*.json
