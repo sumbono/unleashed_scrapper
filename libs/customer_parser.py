@@ -43,7 +43,7 @@ def customer_parser(customers_data):
                 data.pop('Currency')
             else:
                 data.pop('Currency')
-            
+
             customers.append(data)
 
         if customers:
@@ -84,11 +84,3 @@ def customer_parser(customers_data):
             df_contact.to_csv(f'data/Contacts.csv', index=False, mode='w', header=True)
             print(df_contact.head())
             print(df_contact.info())
-
-
-if __name__ == "__main__":
-    endpoint = 'Customers'
-    with open(f"data/{endpoint}.json", "r") as read_file:
-        obj = json.load(read_file)
-        customers_data = obj['Items']
-        customer_parser(customers_data)

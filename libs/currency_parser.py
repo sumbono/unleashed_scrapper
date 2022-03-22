@@ -21,11 +21,3 @@ def currency_parser(currencies_data):
             df_curr.to_csv(f'data/Currencies.csv', index=False, mode='w', header=True)
             print(df_curr.head())
             print(df_curr.info())
-
-
-if __name__ == "__main__":
-    endpoint = 'Currencies'
-    with open(f"data/{endpoint}.json", "r") as read_file:
-        obj = json.load(read_file)
-        currencies_data = obj['Items']
-        currency_parser(currencies_data)

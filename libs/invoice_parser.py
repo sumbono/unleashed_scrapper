@@ -70,11 +70,3 @@ def invoice_parser(invoice_data):
             dfil.to_csv(f'data/InvoiceLines.csv', index=False, mode='w', header=True)
             print(dfil.head())
             print(dfil.info())
-
-if __name__ == "__main__":
-    endpoint = 'Invoices'
-    with open(f"data/{endpoint}.json", "r") as read_file:
-        obj = json.load(read_file)
-        invoices_data = obj['Items']
-        invoice_parser(invoices_data)
-    

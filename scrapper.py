@@ -109,8 +109,8 @@ class UnleashedScraper():
             if res.status_code == 200:
                 data = res.json()
 
-                with open(f"data/{endpoint}.json", "w") as write_file:
-                    json.dump(data, write_file, indent=4)
+                # with open(f"data/{endpoint}.json", "w") as write_file:
+                #     json.dump(data, write_file, indent=4)
                 
                 self.data_parser(data['Items'],endpoint)
             else:
