@@ -2,6 +2,7 @@
 - Scraping Customers & Invoices data from unleashed API.
 - Store the data into csv.
 - Use python 3.7+
+- ERD file in docs folder.
 
 ### Clone the repo and install requirements
 ```
