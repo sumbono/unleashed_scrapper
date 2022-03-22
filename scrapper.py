@@ -1,4 +1,4 @@
-from libs import api_signature, currency_parser, customer_parser, invoice_parser, product_parser
+from libs import api_signature, currency_parser, customer_parser, invoice_parser
 import json, os, random, requests, time
 
 class UnleashedScraper():
@@ -19,8 +19,6 @@ class UnleashedScraper():
 
         if endpoint=='Currencies':
             currency_parser(data)
-        elif endpoint=='Products':
-            product_parser(data)
         elif endpoint=='Customers':
             customer_parser(data)
         elif endpoint=='Invoices':
@@ -125,7 +123,6 @@ class UnleashedScraper():
 if __name__ == "__main__":
     endpoints = [
         # 'Currencies',
-        # 'Products',
         'Customers',
         'Invoices',
     ]
