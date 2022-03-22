@@ -1,10 +1,5 @@
 import json, pandas as pd
 
-def currency_id(curr_code):
-    df_curr = pd.read_csv(f'data/Currencies.csv')
-    df_curr.set_index('CurrencyCode',inplace=True)
-    return int(df_curr.loc[curr_code,'CurrencyId'])
-
 def customer_parser(customers_data):
 
     if customers_data:
@@ -14,25 +9,15 @@ def customer_parser(customers_data):
         contacts = []
 
         for data in customers_data:
-            curr = {}
-            CustomerCodeGuid = f"{data['CustomerCode']}_{data['Guid']}"
-
+            
             if data['Addresses']:
                 for addr in data['Addresses']:
-                    addr['CustomerCodeGuid'] = CustomerCodeGuid
-                    addr['AddressUid'] = f"{addr['AddressType']}_{addr['AddressName']}_{CustomerCodeGuid}"
+                    addr['ParentID'] = data['Guid']
                     addresses.append(addr)
-                data['Addresses'] = CustomerCodeGuid
+                data['Addresses'] = data['Guid']
             else:
                 data['Addresses'] = None
                 
-            if data['Currency']:
-                data['CurrencyId'] = currency_id(data['Currency']['CurrencyCode'])
-                data['Currency'] = data['Currency']['Guid']
-            else:
-                data['CurrencyId'] = None
-                data['Currency'] = None
-
             if data['Contacts']:
                 """_summary_
                     Because there are no information on the docs about this field, 
@@ -46,12 +31,18 @@ def customer_parser(customers_data):
                     }
                 """
                 for contact in data['Contacts']:
-                    contact['CustomerCodeGuid'] = CustomerCodeGuid
-                    contact['CustomerContactUid'] = f"{contact['Guid']}_{CustomerCodeGuid}"
+                    contact['ParentID'] = data['Guid']
                     contacts.append(contact)
-                data['Contacts'] = CustomerCodeGuid
+                data['Contacts'] = data['Guid']
             else:
                 data['Contacts'] = None
+            
+            if data['Currency']:
+                for k,v in data['Currency'].items():
+                    data[f'Currency.{k}'] = v
+                data.pop('Currency')
+            else:
+                data.pop('Currency')
             
             customers.append(data)
 

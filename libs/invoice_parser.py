@@ -1,69 +1,115 @@
 import json, pandas as pd
-endpoint = 'Invoices'
 
 def add_new_address(data):
+    """_summary_
+        - adding new address if this address currently not exist on data/Addresses.csv.
+        - For next development.
+    Args:
+        data (dict): new address details.
+    """
     pass
 
 def add_new_customer(data):
-    # columns = [
-    #     Addresses,Contacts,TaxCode,TaxRate,CustomerCode,CustomerName,GSTVATNumber,BankName,BankBranch,BankAccount,Website,PhoneNumber,FaxNumber,MobileNumber,DDINumber,TollFreeNumber,Email,EmailCC,Currency,Notes,Taxable,XeroContactId,SalesPerson,DiscountRate,PrintPackingSlipInsteadOfInvoice,PrintInvoice,StopCredit,Obsolete,XeroSalesAccount,XeroCostOfGoodsAccount,SellPriceTier,SellPriceTierReference,CustomerType,PaymentTerm,ContactFirstName,ContactLastName,SourceId,CreatedBy,CreatedOn,LastModifiedBy,Guid,LastModifiedOn,CurrencyId
-    # ]
+    """_summary_
+        - adding new customer if this customer currently not exist on data/Customers.csv.
+        - For next development.
+    Args:
+        data (dict): new customer details.
+    """
     pass
 
 def add_new_product(data):
+    """_summary_
+        - adding new product if this product currently not exist on data/Products.csv.
+        - For next development.
+    Args:
+        data (dict): new product details.
+    """
     pass
 
-def customer_guid(cust_code):
+def customer_guid(CustomerCode):
+    """_summary_
+        Get customer Guid from existing data on data/Customers.csv.
+    Args:
+        CustomerCode (str): CustomerCode.
+
+    Returns:
+        str: Guid of this CustomerCode.
+    """
+
     df_cust = pd.read_csv(f'data/Customers.csv')
     df_cust.set_index('CustomerCode',inplace=True)
-    return df_cust.loc[cust_code,'Guid']
+    return df_cust.loc[CustomerCode,'Guid']
 
 def deliveryaddr_ccg(AddressUid):
+    """_summary_
+        Get address CustomerCodeGuid from existing data on data/Addresss.csv.
+    Args:
+        AddressUid (str): AddressUid.
+
+    Returns:
+        str: CustomerCodeGuid of this addressUid.
+    """
+    
     df_cust = pd.read_csv(f'data/Addresses.csv')
     df_cust.set_index('AddressUid',inplace=True)
     return df_cust.loc[AddressUid,'CustomerCodeGuid']
 
 def product_guid(ProductCode):
+    """_summary_
+        Get Product Guid from existing data on data/Products.csv.
+    Args:
+        ProductCode (str): ProductCode.
+
+    Returns:
+        str: Guid of this ProductCode.
+    """
+
     df_product = pd.read_csv(f'data/Products.csv')
     df_product.set_index('ProductCode',inplace=True)
     return df_product.loc[ProductCode,'Guid']
 
 def invoice_parser(invoice_data):
+    """_summary_
+        - Invoices raw data parser.
+        - parsed data save to csv.
+    Args:
+        invoice_data (dict): raw data of Invoices.
+    """
     
     if invoice_data:
         invoice_lines = []
         invoices = []
 
         for data in invoice_data:
-            CustomerCodeGuid = f"{data['Customer']['CustomerCode']}_{data['Customer']['Guid']}"
             
-            # check the Customer's Guid
-            if not customer_guid(data['Customer']['CustomerCode'])==data['Customer']['Guid']:
-                add_new_customer(data['Customer'])
-            data['Customer'] = data['Customer']['Guid']
-
-            # Check the DeliveryAddress uid
-            if data['DeliveryAddress']:
-                if data['DeliveryAddress']['AddressType'] and data['DeliveryAddress']['AddressName']:
-                    AddressUid = f"{data['DeliveryAddress']['AddressType']}_{data['DeliveryAddress']['AddressName']}_{CustomerCodeGuid}"
-                    if not deliveryaddr_ccg(AddressUid)==CustomerCodeGuid:
-                        add_new_address(data['DeliveryAddress'])
-                    data['DeliveryAddress'] = CustomerCodeGuid
-                else:
-                    data['DeliveryAddress'] = None
+            if data['Customer']:
+                for k,v in data['Customer'].items():
+                    data[f'Customer.{k}'] = v
+                data.pop('Customer')
             else:
-                data['DeliveryAddress'] = None
+                data.pop('Customer')
+
+            if data['DeliveryAddress']:
+                for k,v in data['DeliveryAddress'].items():
+                    data[f'DeliveryAddress.{k}'] = v
+                data.pop('DeliveryAddress')
+            else:
+                data.pop('DeliveryAddress')
 
             if data['InvoiceLines']:
                 invoice_guid = data['Guid']
                 for iline in data['InvoiceLines']:
-                    #check the product guid
-                    if not product_guid(iline['Product']['ProductCode'])==iline['Product']['Guid']:
-                        add_new_product(iline['Product'])
+                    if iline['Product']:
+                        for k,v in iline['Product'].items():
+                            iline[f'Product.{k}'] = v
+                        iline.pop('Product')
+                    else:
+                        iline.pop('Product')
                     
-                    iline['Product'] = iline['Product']['Guid']
-                    iline['InvoiceGuid'] = invoice_guid
+                    iline['ParentID'] = invoice_guid
                     invoice_lines.append(iline)
+
                 data['InvoiceLines'] = invoice_guid
 
             invoices.append(data)
